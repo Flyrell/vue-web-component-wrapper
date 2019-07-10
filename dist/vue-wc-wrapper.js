@@ -1,267 +1,370 @@
-const camelizeRE = /-(\w)/g
-const camelize = str => {
-  return str.replace(camelizeRE, (_, c) => c ? c.toUpperCase() : '')
-}
-
-const hyphenateRE = /\B([A-Z])/g
-const hyphenate = str => {
-  return str.replace(hyphenateRE, '-$1').toLowerCase()
-}
-
-function getInitialProps (propsList) {
-  const res = {}
-  propsList.forEach(key => {
-    res[key] = undefined
-  })
-  return res
-}
-
-function injectHook (options, key, hook) {
-  options[key] = [].concat(options[key] || [])
-  options[key].unshift(hook)
-}
-
-function callHooks (vm, hook) {
-  if (vm) {
-    const hooks = vm.$options[hook] || []
-    hooks.forEach(hook => {
-      hook.call(vm)
-    })
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
   }
 }
 
-function createCustomEvent (name, args) {
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if ("value" in descriptor) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+
+  return _assertThisInitialized(self);
+}
+
+var camelizeRE = /-(\w)/g;
+var camelize = function camelize(str) {
+  return str.replace(camelizeRE, function (_, c) {
+    return c ? c.toUpperCase() : '';
+  });
+};
+var hyphenateRE = /\B([A-Z])/g;
+var hyphenate = function hyphenate(str) {
+  return str.replace(hyphenateRE, '-$1').toLowerCase();
+};
+function getInitialProps(propsList) {
+  var res = {};
+  propsList.forEach(function (key) {
+    res[key] = undefined;
+  });
+  return res;
+}
+function injectHook(options, key, hook) {
+  options[key] = [].concat(options[key] || []);
+  options[key].unshift(hook);
+}
+function callHooks(vm, hook) {
+  if (vm) {
+    var hooks = vm.$options[hook] || [];
+    hooks.forEach(function (hook) {
+      hook.call(vm);
+    });
+  }
+}
+function createCustomEvent(name, args) {
   return new CustomEvent(name, {
     bubbles: false,
     cancelable: false,
     detail: args
-  })
+  });
 }
 
-const isBoolean = val => /function Boolean/.test(String(val))
-const isNumber = val => /function Number/.test(String(val))
+var isBoolean = function isBoolean(val) {
+  return /function Boolean/.test(String(val));
+};
 
-function convertAttributeValue (value, name, { type } = {}) {
+var isNumber = function isNumber(val) {
+  return /function Number/.test(String(val));
+};
+
+function convertAttributeValue(value, name) {
+  var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+      type = _ref.type;
+
   if (isBoolean(type)) {
     if (value === 'true' || value === 'false') {
-      return value === 'true'
+      return value === 'true';
     }
+
     if (value === '' || value === name) {
-      return true
+      return true;
     }
-    return value != null
+
+    return value != null;
   } else if (isNumber(type)) {
-    const parsed = parseFloat(value, 10)
-    return isNaN(parsed) ? value : parsed
+    var parsed = parseFloat(value, 10);
+    return isNaN(parsed) ? value : parsed;
   } else {
-    return value
+    return value;
   }
 }
+function toVNodes(h, children) {
+  var res = [];
 
-function toVNodes (h, children) {
-  const res = []
-  for (let i = 0, l = children.length; i < l; i++) {
-    res.push(toVNode(h, children[i]))
+  for (var i = 0, l = children.length; i < l; i++) {
+    res.push(toVNode(h, children[i]));
   }
-  return res
+
+  return res;
 }
 
-function toVNode (h, node) {
+function toVNode(h, node) {
   if (node.nodeType === 3) {
-    return node.data.trim() ? node.data : null
+    return node.data.trim() ? node.data : null;
   } else if (node.nodeType === 1) {
-    const data = {
+    var data = {
       attrs: getAttributes(node),
       domProps: {
         innerHTML: node.innerHTML
       }
-    }
+    };
+
     if (data.attrs.slot) {
-      data.slot = data.attrs.slot
-      delete data.attrs.slot
+      data.slot = data.attrs.slot;
+      delete data.attrs.slot;
     }
-    return h(node.tagName, data)
+
+    return h(node.tagName, data);
   } else {
-    return null
+    return null;
   }
 }
 
-function getAttributes (node) {
-  const res = {}
-  for (let i = 0, l = node.attributes.length; i < l; i++) {
-    const attr = node.attributes[i]
-    res[attr.nodeName] = attr.nodeValue
+function getAttributes(node) {
+  var res = {};
+
+  for (var i = 0, l = node.attributes.length; i < l; i++) {
+    var attr = node.attributes[i];
+    res[attr.nodeName] = attr.nodeValue;
   }
-  return res
+
+  return res;
 }
 
-function wrap (Vue, Component) {
-  const isAsync = typeof Component === 'function' && !Component.cid
-  let isInitialized = false
-  let hyphenatedPropsList
-  let camelizedPropsList
-  let camelizedPropsMap
+function _CustomElement() {
+  return Reflect.construct(HTMLElement, [], this.__proto__.constructor);
+}
 
-  function initialize (Component) {
-    if (isInitialized) return
 
-    const options = typeof Component === 'function'
-      ? Component.options
-      : Component
+Object.setPrototypeOf(_CustomElement.prototype, HTMLElement.prototype);
+Object.setPrototypeOf(_CustomElement, HTMLElement);
+function wrap(Vue, Component) {
+  var isAsync = typeof Component === 'function' && !Component.cid;
+  var isInitialized = false;
+  var hyphenatedPropsList;
+  var camelizedPropsList;
+  var camelizedPropsMap;
 
-    // extract props info
-    const propsList = Array.isArray(options.props)
-      ? options.props
-      : Object.keys(options.props || {})
-    hyphenatedPropsList = propsList.map(hyphenate)
-    camelizedPropsList = propsList.map(camelize)
-    const originalPropsAsObject = Array.isArray(options.props) ? {} : options.props || {}
-    camelizedPropsMap = camelizedPropsList.reduce((map, key, i) => {
-      map[key] = originalPropsAsObject[propsList[i]]
-      return map
-    }, {})
+  function initialize(Component) {
+    if (isInitialized) return;
+    var options = typeof Component === 'function' ? Component.options : Component; // extract props info
 
-    // proxy $emit to native DOM events
+    var propsList = Array.isArray(options.props) ? options.props : Object.keys(options.props || {});
+    hyphenatedPropsList = propsList.map(hyphenate);
+    camelizedPropsList = propsList.map(camelize);
+    var originalPropsAsObject = Array.isArray(options.props) ? {} : options.props || {};
+    camelizedPropsMap = camelizedPropsList.reduce(function (map, key, i) {
+      map[key] = originalPropsAsObject[propsList[i]];
+      return map;
+    }, {}); // proxy $emit to native DOM events
+
     injectHook(options, 'beforeCreate', function () {
-      const emit = this.$emit
-      this.$emit = (name, ...args) => {
-        this.$root.$options.customElement.dispatchEvent(createCustomEvent(name, args))
-        return emit.call(this, name, ...args)
-      }
-    })
+      var _this = this;
 
+      var emit = this.$emit;
+
+      this.$emit = function (name) {
+        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
+        }
+
+        _this.$root.$options.customElement.dispatchEvent(createCustomEvent(name, args));
+
+        return emit.call.apply(emit, [_this, name].concat(args));
+      };
+    });
     injectHook(options, 'created', function () {
-      // sync default props values to wrapper on created
-      camelizedPropsList.forEach(key => {
-        this.$root.props[key] = this[key]
-      })
-    })
+      var _this2 = this;
 
-    // proxy props as Element properties
-    camelizedPropsList.forEach(key => {
+      // sync default props values to wrapper on created
+      camelizedPropsList.forEach(function (key) {
+        _this2.$root.props[key] = _this2[key];
+      });
+    }); // proxy props as Element properties
+
+    camelizedPropsList.forEach(function (key) {
       Object.defineProperty(CustomElement.prototype, key, {
-        get () {
-          return this._wrapper.props[key]
+        get: function get() {
+          return this._wrapper.props[key];
         },
-        set (newVal) {
-          this._wrapper.props[key] = newVal
+        set: function set(newVal) {
+          this._wrapper.props[key] = newVal;
         },
         enumerable: false,
         configurable: true
-      })
-    })
-
-    isInitialized = true
+      });
+    });
+    isInitialized = true;
   }
 
-  function syncAttribute (el, key) {
-    const camelized = camelize(key)
-    const value = el.hasAttribute(key) ? el.getAttribute(key) : undefined
-    el._wrapper.props[camelized] = convertAttributeValue(
-      value,
-      key,
-      camelizedPropsMap[camelized]
-    )
+  function syncAttribute(el, key) {
+    var camelized = camelize(key);
+    var value = el.hasAttribute(key) ? el.getAttribute(key) : undefined;
+    el._wrapper.props[camelized] = convertAttributeValue(value, key, camelizedPropsMap[camelized]);
   }
 
-  class CustomElement extends HTMLElement {
-    constructor () {
-      const self = super()
-      self.attachShadow({ mode: 'open' })
+  var CustomElement =
+  /*#__PURE__*/
+  function (_CustomElement2) {
+    _inherits(CustomElement, _CustomElement2);
 
-      const wrapper = self._wrapper = new Vue({
+    function CustomElement() {
+      var _this3;
+
+      _classCallCheck(this, CustomElement);
+
+      var self = _this3 = _possibleConstructorReturn(this, _getPrototypeOf(CustomElement).call(this));
+
+      self.attachShadow({
+        mode: 'open'
+      });
+      var wrapper = self._wrapper = new Vue({
         name: 'shadow-root',
         customElement: self,
         shadowRoot: self.shadowRoot,
-        data () {
+        data: function data() {
           return {
             props: {},
             slotChildren: []
-          }
+          };
         },
-        render (h) {
+        render: function render(h) {
           return h(Component, {
             ref: 'inner',
             props: this.props
-          }, this.slotChildren)
+          }, this.slotChildren);
         }
-      })
+      }); // Use MutationObserver to react to future attribute & slot content change
 
-      // Use MutationObserver to react to future attribute & slot content change
-      const observer = new MutationObserver(mutations => {
-        let hasChildrenChange = false
-        for (let i = 0; i < mutations.length; i++) {
-          const m = mutations[i]
+      var observer = new MutationObserver(function (mutations) {
+        var hasChildrenChange = false;
+
+        for (var i = 0; i < mutations.length; i++) {
+          var m = mutations[i];
+
           if (isInitialized && m.type === 'attributes' && m.target === self) {
-            syncAttribute(self, m.attributeName)
+            syncAttribute(self, m.attributeName);
           } else {
-            hasChildrenChange = true
+            hasChildrenChange = true;
           }
         }
+
         if (hasChildrenChange) {
-          wrapper.slotChildren = Object.freeze(toVNodes(
-            wrapper.$createElement,
-            self.childNodes
-          ))
+          wrapper.slotChildren = Object.freeze(toVNodes(wrapper.$createElement, self.childNodes));
         }
-      })
+      });
       observer.observe(self, {
         childList: true,
         subtree: true,
         characterData: true,
         attributes: true
-      })
+      });
+      return _this3;
     }
 
-    get vueComponent () {
-      return this._wrapper.$refs.inner
-    }
+    _createClass(CustomElement, [{
+      key: "connectedCallback",
+      value: function connectedCallback() {
+        var _this4 = this;
 
-    connectedCallback () {
-      const wrapper = this._wrapper
-      if (!wrapper._isMounted) {
-        // initialize attributes
-        const syncInitialAttributes = () => {
-          wrapper.props = getInitialProps(camelizedPropsList)
-          hyphenatedPropsList.forEach(key => {
-            syncAttribute(this, key)
-          })
-        }
+        var wrapper = this._wrapper;
 
-        if (isInitialized) {
-          syncInitialAttributes()
+        if (!wrapper._isMounted) {
+          // initialize attributes
+          var syncInitialAttributes = function syncInitialAttributes() {
+            wrapper.props = getInitialProps(camelizedPropsList);
+            hyphenatedPropsList.forEach(function (key) {
+              syncAttribute(_this4, key);
+            });
+          };
+
+          if (isInitialized) {
+            syncInitialAttributes();
+          } else {
+            // async & unresolved
+            Component().then(function (resolved) {
+              if (resolved.__esModule || resolved[Symbol.toStringTag] === 'Module') {
+                resolved = resolved.default;
+              }
+
+              initialize(resolved);
+              syncInitialAttributes();
+            });
+          } // initialize children
+
+
+          wrapper.slotChildren = Object.freeze(toVNodes(wrapper.$createElement, this.childNodes));
+          wrapper.$mount();
+          this.shadowRoot.appendChild(wrapper.$el);
         } else {
-          // async & unresolved
-          Component().then(resolved => {
-            if (resolved.__esModule || resolved[Symbol.toStringTag] === 'Module') {
-              resolved = resolved.default
-            }
-            initialize(resolved)
-            syncInitialAttributes()
-          })
+          callHooks(this.vueComponent, 'activated');
         }
-        // initialize children
-        wrapper.slotChildren = Object.freeze(toVNodes(
-          wrapper.$createElement,
-          this.childNodes
-        ))
-        wrapper.$mount()
-        this.shadowRoot.appendChild(wrapper.$el)
-      } else {
-        callHooks(this.vueComponent, 'activated')
       }
-    }
+    }, {
+      key: "disconnectedCallback",
+      value: function disconnectedCallback() {
+        callHooks(this.vueComponent, 'deactivated');
+      }
+    }, {
+      key: "vueComponent",
+      get: function get() {
+        return this._wrapper.$refs.inner;
+      }
+    }]);
 
-    disconnectedCallback () {
-      callHooks(this.vueComponent, 'deactivated')
-    }
-  }
+    return CustomElement;
+  }(_CustomElement);
 
   if (!isAsync) {
-    initialize(Component)
+    initialize(Component);
   }
 
-  return CustomElement
+  return CustomElement;
 }
 
-export default wrap
+export default wrap;
