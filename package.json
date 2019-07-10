@@ -29,6 +29,9 @@
   },
   "homepage": "https://github.com/vuejs/web-component-wrapper#readme",
   "devDependencies": {
+    "@babel/core": "^7.5.4",
+    "@babel/preset-env": "^7.5.4",
+    "babel-plugin-transform-custom-element-classes": "^0.1.0",
     "eslint": "^4.16.0",
     "eslint-plugin-vue-libs": "^2.1.0",
     "http-server": "^0.11.1",
@@ -36,6 +39,7 @@
     "lint-staged": "^6.1.0",
     "puppeteer": "^1.0.0",
     "rollup": "^0.55.3",
+    "rollup-plugin-babel": "^4.3.3",
     "typescript": "^3.2.2",
     "vue": "^2.5.13",
     "yorkie": "^1.0.3"
@@ -45,14 +49,5 @@
       "browser": true
     },
     "extends": "plugin:vue-libs/recommended"
-  },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.js": [
-      "eslint --fix",
-      "git add"
-    ]
   }
 }
